@@ -83,3 +83,6 @@ fastlane/readme.md
 **/lint/outputs/
 **/lint/tmp/
 # lint/reports/
+
+# OS file
+**/.DS_Store
