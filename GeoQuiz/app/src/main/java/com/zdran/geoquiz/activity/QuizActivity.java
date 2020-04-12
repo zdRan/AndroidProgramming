@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +19,8 @@ public class QuizActivity extends AppCompatActivity {
     private Button mFalseButton;
 
     private TextView mTextView;
-    private Button mNextButton;
+    private ImageButton mNextButton;
+    private ImageButton mPrevButton;
 
     private Question[] mQuestionsBank = new Question[]{
             new Question(R.string.question_australia, true),
@@ -56,13 +58,21 @@ public class QuizActivity extends AppCompatActivity {
 
         //增加 next 按钮
         mTextView = findViewById(R.id.question_text_view);
+        updateQuestionText(0);
+        //下一题
         mNextButton = findViewById(R.id.next_button);
-
-        updateQuestionText();
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateQuestionText();
+                updateQuestionText(1);
+            }
+        });
+        //上一题
+        mPrevButton = findViewById(R.id.prev_button);
+        mPrevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateQuestionText(-1);
             }
         });
     }
@@ -70,20 +80,24 @@ public class QuizActivity extends AppCompatActivity {
     /**
      * 更新问题
      */
-    private void updateQuestionText() {
-        mCurrentIndex = (mCurrentIndex + 1) % mQuestionsBank.length;
+    private void updateQuestionText(int stepNumber) {
+        mCurrentIndex = (mCurrentIndex + stepNumber) % mQuestionsBank.length;
+        if (mCurrentIndex < 0) {
+            mCurrentIndex = mQuestionsBank.length - 1;
+        }
         int question = mQuestionsBank[mCurrentIndex].getTextResId();
         mTextView.setText(question);
     }
 
     /**
      * 检查问题是否正确
+     *
      * @param userPressedTrue 用户答案
      */
-    private void checkAnswer(boolean userPressedTrue){
+    private void checkAnswer(boolean userPressedTrue) {
         if (userPressedTrue == mQuestionsBank[mCurrentIndex].isAnswerTrue()) {
             Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             Toast.makeText(this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
         }
     }
