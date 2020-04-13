@@ -1,19 +1,20 @@
 package com.zdran.geoquiz.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.zdran.geoquiz.R;
 import com.zdran.geoquiz.model.Question;
 
 public class QuizActivity extends AppCompatActivity {
+    private static final String TAG = "QuizActivity";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -36,6 +37,9 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate: 方法执行");
+
         setContentView(R.layout.activity_main);
         setTitle(R.string.app_name);
         //获取组件
@@ -75,6 +79,36 @@ public class QuizActivity extends AppCompatActivity {
                 updateQuestionText(-1);
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: 方法执行");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: 方法执行");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: 方法执行");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: 方法执行");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: 方法执行");
     }
 
     /**
