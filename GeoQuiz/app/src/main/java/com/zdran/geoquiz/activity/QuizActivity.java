@@ -13,6 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.zdran.geoquiz.R;
 import com.zdran.geoquiz.model.Question;
 
+/**
+ * Create by Ranzd on 2020-04-11 22:31
+ *
+ * @author cm.zdran@foxmail.com
+ */
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
@@ -22,7 +27,9 @@ public class QuizActivity extends AppCompatActivity {
     private TextView mTextView;
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
-
+    /**
+     * 问题列表
+     */
     private Question[] mQuestionsBank = new Question[]{
             new Question(R.string.question_australia, true),
             new Question(R.string.question_oceans, true),
@@ -31,12 +38,23 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_americas, true),
             new Question(R.string.question_asia, true),
     };
-
+    /**
+     * 当前问题的下标
+     */
     private int mCurrentIndex = 0;
+    /**
+     * 用户回答正确的问题数量
+     */
+    private int mCorrectCount = 0;
+    /**
+     * 用户回答错误的问题数量
+     */
+    private int mIncorrectCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //屏幕旋转后重新加载问题
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
         }
@@ -118,6 +136,7 @@ public class QuizActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState: 方法执行");
+        //Activity 销毁前保存问题下标
         outState.putInt(KEY_INDEX, mCurrentIndex);
     }
 
@@ -139,10 +158,25 @@ public class QuizActivity extends AppCompatActivity {
      * @param userPressedTrue 用户答案
      */
     private void checkAnswer(boolean userPressedTrue) {
+        //已经回答过的问题不能再次回答
+        if (mQuestionsBank[mCurrentIndex].isUsed()) {
+            Log.i(TAG, "onClick: 已经回答过该题！");
+            return;
+        }
+
         if (userPressedTrue == mQuestionsBank[mCurrentIndex].isAnswerTrue()) {
             Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
+            mCorrectCount++;
         } else {
             Toast.makeText(this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
+            mIncorrectCount++;
+        }
+        mQuestionsBank[mCurrentIndex].setUsed(true);
+
+        if (mCorrectCount + mIncorrectCount == mQuestionsBank.length) {
+            Toast.makeText(this,
+                    "游戏结束！得分！" + Math.rint(mCorrectCount * 100.0 / mQuestionsBank.length * 100.0) / 100,
+                    Toast.LENGTH_LONG).show();
         }
     }
 }
