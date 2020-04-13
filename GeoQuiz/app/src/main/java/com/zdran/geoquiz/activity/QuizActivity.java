@@ -15,7 +15,7 @@ import com.zdran.geoquiz.model.Question;
 
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
-
+    private static final String KEY_INDEX = "index";
     private Button mTrueButton;
     private Button mFalseButton;
 
@@ -37,7 +37,9 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        }
         Log.d(TAG, "onCreate: 方法执行");
 
         setContentView(R.layout.activity_main);
@@ -60,8 +62,9 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-        //增加 next 按钮
+
         mTextView = findViewById(R.id.question_text_view);
+
         updateQuestionText(0);
         //下一题
         mNextButton = findViewById(R.id.next_button);
@@ -109,6 +112,13 @@ public class QuizActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: 方法执行");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSaveInstanceState: 方法执行");
+        outState.putInt(KEY_INDEX, mCurrentIndex);
     }
 
     /**
