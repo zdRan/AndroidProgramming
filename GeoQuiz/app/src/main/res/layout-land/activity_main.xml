@@ -51,6 +51,13 @@
             android:contentDescription="@string/prev_button">
         </ImageButton>
     </LinearLayout>
-
+    <Button
+        android:id="@+id/cheat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@mipmap/arrow_right"
+        android:drawablePadding="4dp"
+        android:layout_gravity="bottom"
+        android:text="@string/cheat_button" />
 
 </FrameLayout>

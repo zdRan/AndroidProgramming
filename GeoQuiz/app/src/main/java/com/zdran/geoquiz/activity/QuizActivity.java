@@ -1,5 +1,6 @@
 package com.zdran.geoquiz.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,12 +22,10 @@ import com.zdran.geoquiz.model.Question;
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
-    private Button mTrueButton;
-    private Button mFalseButton;
+    protected Button mFalseButton;
 
     private TextView mTextView;
-    private ImageButton mNextButton;
-    private ImageButton mPrevButton;
+    private Button mCheatButton;
     /**
      * 问题列表
      */
@@ -63,11 +62,11 @@ public class QuizActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setTitle(R.string.app_name);
         //获取组件
-        mTrueButton = findViewById(R.id.true_button);
+        Button trueButton = findViewById(R.id.true_button);
         mFalseButton = findViewById(R.id.false_button);
 
         //设置监听器
-        mTrueButton.setOnClickListener(new View.OnClickListener() {
+        trueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkAnswer(true);
@@ -85,19 +84,30 @@ public class QuizActivity extends AppCompatActivity {
 
         updateQuestionText(0);
         //下一题
-        mNextButton = findViewById(R.id.next_button);
-        mNextButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton nextButton = findViewById(R.id.next_button);
+        nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateQuestionText(1);
             }
         });
         //上一题
-        mPrevButton = findViewById(R.id.prev_button);
-        mPrevButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton prevButton = findViewById(R.id.prev_button);
+        prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateQuestionText(-1);
+            }
+        });
+
+        //查看答案
+        mCheatButton = findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean answer = mQuestionsBank[mCurrentIndex].isAnswerTrue();
+                Intent intent = CheatActivity.newIntent(QuizActivity.this, answer);
+                startActivity(intent);
             }
         });
     }
