@@ -23,6 +23,11 @@ import com.zdran.geoquiz.model.Question;
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_CHEAT = "cheat";
+    private static final String KEY_CORRECT_COUNT = "correctCount";
+    private static final String KEY_INCORRECT_COUNT = "incorrectCount";
+    private static final String KEY_USED = "used";
+
     //查看答案的 Activity 请求码
     private static final int REQUEST_CODE_CHEAT = 0;
 
@@ -30,10 +35,6 @@ public class QuizActivity extends AppCompatActivity {
      * 问题文本
      */
     private TextView mTextView;
-    /**
-     * 是否作弊
-     */
-    private boolean mIsCheater;
 
     /**
      * 问题列表
@@ -46,6 +47,14 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_americas, true),
             new Question(R.string.question_asia, true),
     };
+    /**
+     * 每个问题是否作弊
+     */
+    private boolean[] mIsCheaterArray = new boolean[mQuestionsBank.length];
+    /**
+     * 每个问题是否回答过
+     */
+    private boolean[] mIsUsed = new boolean[mQuestionsBank.length];
     /**
      * 当前问题的下标
      */
@@ -65,6 +74,10 @@ public class QuizActivity extends AppCompatActivity {
         //屏幕旋转后重新加载问题
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mCorrectCount = savedInstanceState.getInt(KEY_CORRECT_COUNT, 0);
+            mIncorrectCount = savedInstanceState.getInt(KEY_INCORRECT_COUNT, 0);
+            mIsCheaterArray = savedInstanceState.getBooleanArray(KEY_CHEAT);
+            mIsUsed = savedInstanceState.getBooleanArray(KEY_USED);
         }
         Log.d(TAG, "onCreate: 方法执行");
 
@@ -84,7 +97,6 @@ public class QuizActivity extends AppCompatActivity {
         falseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mIsCheater = false;
                 checkAnswer(false);
             }
         });
@@ -98,6 +110,7 @@ public class QuizActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 updateQuestionText(1);
             }
         });
@@ -117,7 +130,7 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean answer = mQuestionsBank[mCurrentIndex].isAnswerTrue();
                 Intent intent = CheatActivity.newIntent(QuizActivity.this, answer);
-                startActivityForResult(intent,REQUEST_CODE_CHEAT);
+                startActivityForResult(intent, REQUEST_CODE_CHEAT);
             }
         });
     }
@@ -158,13 +171,19 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState: 方法执行");
         //Activity 销毁前保存问题下标
         outState.putInt(KEY_INDEX, mCurrentIndex);
+        outState.putInt(KEY_CORRECT_COUNT, mCorrectCount);
+        outState.putInt(KEY_INCORRECT_COUNT, mIncorrectCount);
+        outState.putBooleanArray(KEY_CHEAT, mIsCheaterArray);
+        outState.putBooleanArray(KEY_USED, mIsUsed);
+
     }
 
     /**
      * 处理子 Activity 的返回结果
+     *
      * @param requestCode 请求参数时原始到的 请求代码
-     * @param resultCode 返回结果里的返回代码
-     * @param data 返回的数据
+     * @param resultCode  返回结果里的返回代码
+     * @param data        返回的数据
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -174,7 +193,9 @@ public class QuizActivity extends AppCompatActivity {
         if (resultCode != RESULT_OK) {
             return;
         }
-        mIsCheater = CheatActivity.wasAnswerShow(data);
+        if (data != null) {
+            mIsCheaterArray[mCurrentIndex] = CheatActivity.wasAnswerShow(data);
+        }
     }
 
     /**
@@ -197,16 +218,15 @@ public class QuizActivity extends AppCompatActivity {
     private void checkAnswer(boolean userPressedTrue) {
 
         //已经回答过的问题不能再次回答
-        if (mQuestionsBank[mCurrentIndex].isUsed()) {
+        if (mIsUsed[mCurrentIndex]) {
             Log.i(TAG, "onClick: 已经回答过该题！");
             return;
         }
         //如果查看答案，认为答错
-        if (mIsCheater){
+        if (mIsCheaterArray[mCurrentIndex]) {
             Toast.makeText(this, R.string.judgment_toast, Toast.LENGTH_SHORT).show();
             mIncorrectCount++;
-
-        }else {
+        } else {
             if (userPressedTrue == mQuestionsBank[mCurrentIndex].isAnswerTrue()) {
                 Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
                 mCorrectCount++;
@@ -215,7 +235,7 @@ public class QuizActivity extends AppCompatActivity {
                 mIncorrectCount++;
             }
         }
-        mQuestionsBank[mCurrentIndex].setUsed(true);
+        mIsUsed[mCurrentIndex] = true;
         if (mCorrectCount + mIncorrectCount == mQuestionsBank.length) {
             Toast.makeText(this,
                     "游戏结束！得分！" + Math.rint(mCorrectCount * 100.0 / mQuestionsBank.length * 100.0) / 100,
