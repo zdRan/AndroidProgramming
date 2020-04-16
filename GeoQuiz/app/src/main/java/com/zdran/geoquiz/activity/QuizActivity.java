@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zdran.geoquiz.R;
@@ -22,10 +23,18 @@ import com.zdran.geoquiz.model.Question;
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
-    protected Button mFalseButton;
+    //查看答案的 Activity 请求码
+    private static final int REQUEST_CODE_CHEAT = 0;
 
+    /**
+     * 问题文本
+     */
     private TextView mTextView;
-    private Button mCheatButton;
+    /**
+     * 是否作弊
+     */
+    private boolean mIsCheater;
+
     /**
      * 问题列表
      */
@@ -63,7 +72,7 @@ public class QuizActivity extends AppCompatActivity {
         setTitle(R.string.app_name);
         //获取组件
         Button trueButton = findViewById(R.id.true_button);
-        mFalseButton = findViewById(R.id.false_button);
+        Button falseButton = findViewById(R.id.false_button);
 
         //设置监听器
         trueButton.setOnClickListener(new View.OnClickListener() {
@@ -72,9 +81,10 @@ public class QuizActivity extends AppCompatActivity {
                 checkAnswer(true);
             }
         });
-        mFalseButton.setOnClickListener(new View.OnClickListener() {
+        falseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsCheater = false;
                 checkAnswer(false);
             }
         });
@@ -101,13 +111,13 @@ public class QuizActivity extends AppCompatActivity {
         });
 
         //查看答案
-        mCheatButton = findViewById(R.id.cheat_button);
-        mCheatButton.setOnClickListener(new View.OnClickListener() {
+        Button cheatButton = findViewById(R.id.cheat_button);
+        cheatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean answer = mQuestionsBank[mCurrentIndex].isAnswerTrue();
                 Intent intent = CheatActivity.newIntent(QuizActivity.this, answer);
-                startActivity(intent);
+                startActivityForResult(intent,REQUEST_CODE_CHEAT);
             }
         });
     }
@@ -151,6 +161,23 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     /**
+     * 处理子 Activity 的返回结果
+     * @param requestCode 请求参数时原始到的 请求代码
+     * @param resultCode 返回结果里的返回代码
+     * @param data 返回的数据
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode != REQUEST_CODE_CHEAT) {
+            return;
+        }
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        mIsCheater = CheatActivity.wasAnswerShow(data);
+    }
+
+    /**
      * 更新问题
      */
     private void updateQuestionText(int stepNumber) {
@@ -168,21 +195,27 @@ public class QuizActivity extends AppCompatActivity {
      * @param userPressedTrue 用户答案
      */
     private void checkAnswer(boolean userPressedTrue) {
+
         //已经回答过的问题不能再次回答
         if (mQuestionsBank[mCurrentIndex].isUsed()) {
             Log.i(TAG, "onClick: 已经回答过该题！");
             return;
         }
-
-        if (userPressedTrue == mQuestionsBank[mCurrentIndex].isAnswerTrue()) {
-            Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
-            mCorrectCount++;
-        } else {
-            Toast.makeText(this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
+        //如果查看答案，认为答错
+        if (mIsCheater){
+            Toast.makeText(this, R.string.judgment_toast, Toast.LENGTH_SHORT).show();
             mIncorrectCount++;
+
+        }else {
+            if (userPressedTrue == mQuestionsBank[mCurrentIndex].isAnswerTrue()) {
+                Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
+                mCorrectCount++;
+            } else {
+                Toast.makeText(this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
+                mIncorrectCount++;
+            }
         }
         mQuestionsBank[mCurrentIndex].setUsed(true);
-
         if (mCorrectCount + mIncorrectCount == mQuestionsBank.length) {
             Toast.makeText(this,
                     "游戏结束！得分！" + Math.rint(mCorrectCount * 100.0 / mQuestionsBank.length * 100.0) / 100,
