@@ -67,6 +67,10 @@ public class QuizActivity extends AppCompatActivity {
      * 用户回答错误的问题数量
      */
     private int mIncorrectCount = 0;
+    /**
+     * 用户尽最大作弊数
+     */
+    private int mMaxCheaterCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +132,11 @@ public class QuizActivity extends AppCompatActivity {
         cheatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mMaxCheaterCount > 3) {
+                    Toast.makeText(QuizActivity.this,"没机会了！！", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "onClick: 最终版！终于结束了！");
+                    return;
+                }
                 boolean answer = mQuestionsBank[mCurrentIndex].isAnswerTrue();
                 Intent intent = CheatActivity.newIntent(QuizActivity.this, answer);
                 startActivityForResult(intent, REQUEST_CODE_CHEAT);
@@ -226,6 +235,7 @@ public class QuizActivity extends AppCompatActivity {
         if (mIsCheaterArray[mCurrentIndex]) {
             Toast.makeText(this, R.string.judgment_toast, Toast.LENGTH_SHORT).show();
             mIncorrectCount++;
+            mMaxCheaterCount++;
         } else {
             if (userPressedTrue == mQuestionsBank[mCurrentIndex].isAnswerTrue()) {
                 Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
