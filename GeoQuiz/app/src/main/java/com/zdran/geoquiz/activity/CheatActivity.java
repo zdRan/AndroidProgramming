@@ -36,6 +36,8 @@ public class CheatActivity extends AppCompatActivity {
 
     private TextView mAnswerTextView;
 
+    private TextView mBuildVersionTextView;
+
     private Button mShowAnswerButton;
     /**
      * 是否查看了答案，解决屏幕旋转的问题
@@ -87,9 +89,9 @@ public class CheatActivity extends AppCompatActivity {
                 }
                 mIsShowAnswer = true;
                 //低版本不显示动画
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     showAnimator();
-                }else {
+                } else {
                     mShowAnswerButton.setVisibility(View.INVISIBLE);
                 }
             }
@@ -106,6 +108,9 @@ public class CheatActivity extends AppCompatActivity {
                 }
             }
         }
+        //显示版本号
+        mBuildVersionTextView = findViewById(R.id.build_version_text);
+        mBuildVersionTextView.setText(String.valueOf(Build.VERSION.SDK_INT));
     }
 
     /**
