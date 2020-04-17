@@ -2,11 +2,15 @@ package com.zdran.geoquiz.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -31,6 +35,8 @@ public class CheatActivity extends AppCompatActivity {
     private boolean mAnswerIsTrue;
 
     private TextView mAnswerTextView;
+
+    private Button mShowAnswerButton;
     /**
      * 是否查看了答案，解决屏幕旋转的问题
      */
@@ -68,10 +74,10 @@ public class CheatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cheat);
         mAnswerIsTrue = super.getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
         //显示答案
-        Button showAnswerButton = findViewById(R.id.show_answer_button);
+        mShowAnswerButton = findViewById(R.id.show_answer_button);
         mAnswerTextView = findViewById(R.id.answer_text_view);
 
-        showAnswerButton.setOnClickListener(new View.OnClickListener() {
+        mShowAnswerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mAnswerIsTrue) {
@@ -80,6 +86,12 @@ public class CheatActivity extends AppCompatActivity {
                     mAnswerTextView.setText(R.string.false_button);
                 }
                 mIsShowAnswer = true;
+                //低版本不显示动画
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    showAnimator();
+                }else {
+                    mShowAnswerButton.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -98,6 +110,7 @@ public class CheatActivity extends AppCompatActivity {
 
     /**
      * 解决当前屏幕旋转后，清除了作弊痕迹
+     *
      * @param outState
      */
     @Override
@@ -107,7 +120,7 @@ public class CheatActivity extends AppCompatActivity {
     }
 
     /**
-     *一定要在 super.finish(); 之前 setResult。
+     * 一定要在 super.finish(); 之前 setResult。
      */
     @Override
     public void finish() {
@@ -125,5 +138,23 @@ public class CheatActivity extends AppCompatActivity {
         Intent data = new Intent();
         data.putExtra(EXTRA_ANSWER_SHOWN, isShowAnswer);
         setResult(RESULT_OK, data);
+    }
+
+    /**
+     * 添加动画
+     */
+    private void showAnimator() {
+        int cx = mShowAnswerButton.getWidth() / 2;
+        int cy = mShowAnswerButton.getHeight() / 2;
+        float radius = mShowAnswerButton.getWidth();
+        Animator animator = ViewAnimationUtils.createCircularReveal(mShowAnswerButton, cx, cy, radius, 0);
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mShowAnswerButton.setVisibility(View.INVISIBLE);
+            }
+        });
+        animator.start();
     }
 }
