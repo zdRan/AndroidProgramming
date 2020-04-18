@@ -26,5 +26,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    //其实不添加也没问题，最新的 Fragment 在 androidx 包里，
     implementation 'com.android.support:appcompat-v7:29.0.0'
 }
