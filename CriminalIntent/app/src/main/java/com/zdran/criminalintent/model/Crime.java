@@ -26,6 +26,10 @@ public class Crime {
      * 是否修正
      */
     private boolean mSolved;
+    /**
+     * 是否需要警察介入
+     */
+    private boolean mRequiresPolice;
 
     public Crime() {
         this.mId = UUID.randomUUID();
@@ -64,6 +68,14 @@ public class Crime {
         mSolved = solved;
     }
 
+    public boolean isRequiresPolice() {
+        return mRequiresPolice;
+    }
+
+    public void setRequiresPolice(boolean requiresPolice) {
+        mRequiresPolice = requiresPolice;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("{");
@@ -75,6 +87,8 @@ public class Crime {
                 .append(mDate).append('\"');
         sb.append(",\"mSolved\":")
                 .append(mSolved);
+        sb.append(",\"mRequiresPolice\":")
+                .append(mRequiresPolice);
         sb.append('}');
         return sb.toString();
     }

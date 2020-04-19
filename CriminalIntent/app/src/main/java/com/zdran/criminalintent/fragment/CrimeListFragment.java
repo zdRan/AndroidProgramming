@@ -81,7 +81,17 @@ public class CrimeListFragment extends Fragment {
         public CrimeListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             //使用 LayoutInflater 来加载 item 视图，并传递给 ViewHolder
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View itemView = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
+            View itemView;
+            switch (viewType) {
+                case 0:
+                    itemView = layoutInflater.inflate(R.layout.list_item_crime_requires_police, parent, false);
+                    break;
+                case 1:
+                    itemView = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
+                    break;
+                default:
+                    itemView = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
+            }
             return new CrimeListHolder(itemView);
         }
 
@@ -94,6 +104,11 @@ public class CrimeListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mCrimeList.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return mCrimeList.get(position).isRequiresPolice() ? 0 : 1;
         }
     }
 
