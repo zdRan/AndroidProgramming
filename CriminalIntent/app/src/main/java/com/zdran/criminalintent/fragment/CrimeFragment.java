@@ -17,8 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import com.zdran.criminalintent.R;
 import com.zdran.criminalintent.model.Crime;
+import com.zdran.criminalintent.model.CrimeLab;
 
-import static android.widget.CompoundButton.*;
+import java.util.Objects;
+import java.util.UUID;
+
+import static android.widget.CompoundButton.OnCheckedChangeListener;
 
 /**
  * Create by Ranzd on 2020-04-18 22:15
@@ -26,6 +30,7 @@ import static android.widget.CompoundButton.*;
  * @author cm.zdran@foxmail.com
  */
 public class CrimeFragment extends Fragment {
+    private static final String ARG_CRIME_ID = "crime_id";
 
     private Crime mCrime;
 
@@ -34,10 +39,20 @@ public class CrimeFragment extends Fragment {
 
     private CheckBox mSolvedCheckBox;
 
+    public static CrimeFragment newInstance(UUID cirmeId) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_CRIME_ID, cirmeId);
+        CrimeFragment crimeFragment = new CrimeFragment();
+        crimeFragment.setArguments(bundle);
+        return crimeFragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCrime = new Crime();
+        UUID uuid = (UUID) Objects.requireNonNull(getArguments()).getSerializable(ARG_CRIME_ID);
+        mCrime = CrimeLab.getCrimeLab(getActivity()).getCrime(uuid);
+
     }
 
     @Nullable
@@ -46,6 +61,7 @@ public class CrimeFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
         mTitleField = v.findViewById(R.id.crime_title);
+        mTitleField.setText(mCrime.getTitle());
         //标题
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -69,6 +85,7 @@ public class CrimeFragment extends Fragment {
         mDateButton.setEnabled(false);
         //是否解决
         mSolvedCheckBox = v.findViewById(R.id.crime_solved);
+        mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
