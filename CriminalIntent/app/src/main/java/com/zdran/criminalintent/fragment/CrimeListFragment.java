@@ -21,6 +21,7 @@ import com.zdran.criminalintent.model.Crime;
 import com.zdran.criminalintent.model.CrimeLab;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Create by Ranzd on 2020-04-19 19:36
@@ -120,11 +121,22 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.updateUI();
+    }
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.getCrimeLab(getActivity());
         List<Crime> crimeList = crimeLab.getCrimeList();
-        mCrimeListAdapter = new CrimeListAdapter(crimeList);
-        mRecyclerView.setAdapter(mCrimeListAdapter);
+        if (Objects.isNull(mCrimeListAdapter)) {
+            mCrimeListAdapter = new CrimeListAdapter(crimeList);
+            mRecyclerView.setAdapter(mCrimeListAdapter);
+        } else {
+            mCrimeListAdapter.notifyDataSetChanged();
+        }
+
 
     }
 }
