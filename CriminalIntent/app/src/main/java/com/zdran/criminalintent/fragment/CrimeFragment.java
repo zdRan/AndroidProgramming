@@ -39,9 +39,9 @@ public class CrimeFragment extends Fragment {
 
     private CheckBox mSolvedCheckBox;
 
-    public static CrimeFragment newInstance(UUID cirmeId) {
+    public static CrimeFragment newInstance(UUID crimeId) {
         Bundle bundle = new Bundle();
-        bundle.putSerializable(ARG_CRIME_ID, cirmeId);
+        bundle.putSerializable(ARG_CRIME_ID, crimeId);
         CrimeFragment crimeFragment = new CrimeFragment();
         crimeFragment.setArguments(bundle);
         return crimeFragment;
