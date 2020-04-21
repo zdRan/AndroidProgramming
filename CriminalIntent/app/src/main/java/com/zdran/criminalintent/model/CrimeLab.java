@@ -3,7 +3,9 @@ package com.zdran.criminalintent.model;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,16 +17,16 @@ import java.util.UUID;
 public class CrimeLab {
 
     private static CrimeLab sCrimeLab;
-    private List<Crime> mCrimeList;
+    private Map<UUID, Crime> mUUIDCrimeMap;
 
     private CrimeLab(Context context) {
-        mCrimeList = new ArrayList<>();
+        mUUIDCrimeMap = new HashMap<>();
         for (int i = 0; i < 100; i++) {
             Crime crime = new Crime();
             crime.setTitle("Crime #" + i);
             crime.setSolved(i % 2 == 0);
             crime.setRequiresPolice(i % 3 == 0);
-            mCrimeList.add(crime);
+            mUUIDCrimeMap.put(crime.getId(), crime);
         }
     }
 
@@ -36,15 +38,10 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimeList() {
-        return this.mCrimeList;
+        return new ArrayList<>(mUUIDCrimeMap.values());
     }
 
     public Crime getCrime(UUID uuid) {
-        for (Crime c : mCrimeList) {
-            if (c.getId().equals(uuid)) {
-                return c;
-            }
-        }
-        return null;
+        return mUUIDCrimeMap.get(uuid);
     }
 }
