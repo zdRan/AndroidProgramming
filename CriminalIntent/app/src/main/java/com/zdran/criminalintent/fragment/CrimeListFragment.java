@@ -31,6 +31,7 @@ import java.util.Objects;
 public class CrimeListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private CrimeListAdapter mCrimeListAdapter;
+    private int mPosition = -1;
 
     @Nullable
     @Override
@@ -74,6 +75,8 @@ public class CrimeListFragment extends Fragment {
         public void onClick(View v) {
             //打开详情页
             Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            //获取当前位置
+            mPosition = super.getBindingAdapterPosition();
             startActivity(intent);
         }
     }
@@ -134,7 +137,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeListAdapter = new CrimeListAdapter(crimeList);
             mRecyclerView.setAdapter(mCrimeListAdapter);
         } else {
-            mCrimeListAdapter.notifyDataSetChanged();
+            mCrimeListAdapter.notifyItemChanged(mPosition);
         }
 
 
