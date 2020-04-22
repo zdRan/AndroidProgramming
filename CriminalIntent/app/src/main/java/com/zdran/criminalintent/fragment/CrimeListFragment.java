@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.zdran.criminalintent.R;
-import com.zdran.criminalintent.activity.CrimeActivity;
+import com.zdran.criminalintent.activity.CrimePagerActivity;
 import com.zdran.criminalintent.model.Crime;
 import com.zdran.criminalintent.model.CrimeLab;
 
@@ -73,10 +73,11 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            //打开详情页
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
-            //获取当前位置
+            //记录当前位置
             mPosition = super.getBindingAdapterPosition();
+
+            //打开详情页
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);
         }
     }

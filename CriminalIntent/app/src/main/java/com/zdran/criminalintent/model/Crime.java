@@ -30,6 +30,10 @@ public class Crime {
      * 是否需要警察介入
      */
     private boolean mRequiresPolice;
+    /**
+     * 新增排序字段
+     */
+    private int sorted = 0;
 
     public Crime() {
         this.mId = UUID.randomUUID();
@@ -76,6 +80,14 @@ public class Crime {
         mRequiresPolice = requiresPolice;
     }
 
+    public int getSorted() {
+        return sorted;
+    }
+
+    public void setSorted(int sorted) {
+        this.sorted = sorted;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("{");
@@ -89,6 +101,8 @@ public class Crime {
                 .append(mSolved);
         sb.append(",\"mRequiresPolice\":")
                 .append(mRequiresPolice);
+        sb.append(",\"sorted\":")
+                .append(sorted);
         sb.append('}');
         return sb.toString();
     }

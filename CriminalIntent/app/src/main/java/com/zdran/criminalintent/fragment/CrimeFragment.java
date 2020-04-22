@@ -3,6 +3,7 @@ package com.zdran.criminalintent.fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import static android.widget.CompoundButton.OnCheckedChangeListener;
  * @author cm.zdran@foxmail.com
  */
 public class CrimeFragment extends Fragment {
+    private static final String TAG = "CrimeFragment";
     private static final String ARG_CRIME_ID = "crime_id";
 
     private Crime mCrime;
@@ -52,7 +54,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID uuid = (UUID) Objects.requireNonNull(getArguments()).getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.getCrimeLab(getActivity()).getCrime(uuid);
-
+        Log.d(TAG, "创建 CrimeFragment: " + mCrime.toString());
     }
 
     @Nullable
