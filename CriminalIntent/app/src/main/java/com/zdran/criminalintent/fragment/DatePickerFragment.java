@@ -1,5 +1,6 @@
 package com.zdran.criminalintent.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,8 +33,6 @@ public class DatePickerFragment extends DialogFragment {
     private DatePicker mDatePicker;
     private Button mDialogDateButton;
 
-    private DateChangeListener mDateChangeListener;
-
     public static DatePickerFragment newInstance(Date date) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(ARGS_DATE, date);
@@ -62,7 +61,6 @@ public class DatePickerFragment extends DialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mDateChangeListener = (DateChangeListener) getActivity();
     }
     //
 //    @NonNull
@@ -113,11 +111,14 @@ public class DatePickerFragment extends DialogFragment {
                 int month = mDatePicker.getMonth();
                 int day = mDatePicker.getDayOfMonth();
                 Date date = new GregorianCalendar(year, month, day).getTime();
-                mDateChangeListener.sendDate(date);
 //                //关闭对话框
 //                FragmentTransaction fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
 //                fragmentTransaction.remove(DatePickerFragment.this);
 //                fragmentTransaction.commit();
+
+                Intent intent = new Intent();
+                intent.putExtra(EXTRA_DATE, date);
+                Objects.requireNonNull(getActivity()).setResult(Activity.RESULT_OK, intent);
                 Objects.requireNonNull(getActivity()).finish();
 
             }
@@ -131,12 +132,5 @@ public class DatePickerFragment extends DialogFragment {
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DATE, date);
         Objects.requireNonNull(getTargetFragment()).onActivityResult(getTargetRequestCode(), resultCode, intent);
-    }
-
-    /**
-     * Fragment 向 Activity 回传数据
-     */
-    public interface DateChangeListener {
-        void sendDate(Date date);
     }
 }

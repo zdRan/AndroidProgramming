@@ -128,7 +128,7 @@ public class CrimeFragment extends Fragment {
         }
         if (requestCode == REQUEST_DATE) {
             Log.d(TAG, "onActivityResult: 执行！！" + requestCode);
-            Date date = DatePickerDialogActivity.getDate(data);
+            Date date = DatePickerFragment.getDate(data);
             Calendar target = Calendar.getInstance();
             target.setTime(Objects.requireNonNull(date));
 
