@@ -22,6 +22,7 @@ import com.zdran.criminalintent.R;
 import com.zdran.criminalintent.model.Crime;
 import com.zdran.criminalintent.model.CrimeLab;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,6 +39,9 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 1;
+
+    private static final String DIALOG_TIME = "DialogTime";
+    private static final int REQUEST_TIME = 2;
 
 
     private Crime mCrime;
@@ -109,6 +113,7 @@ public class CrimeFragment extends Fragment {
 
         this.setTitleField();
         this.setDateButton();
+        this.setTimeButton();
         this.setSolvedCheckBox();
 
         return v;
@@ -119,11 +124,30 @@ public class CrimeFragment extends Fragment {
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
-        if (requestCode != REQUEST_DATE) {
-            return;
+        if (requestCode == REQUEST_DATE) {
+
+            Date date = DatePickerFragment.getDate(data);
+            Calendar target = Calendar.getInstance();
+            target.setTime(Objects.requireNonNull(date));
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(mCrime.getDate());
+            calendar.set(Calendar.YEAR, target.get(Calendar.YEAR));
+            calendar.set(Calendar.MONTH, target.get(Calendar.MONTH));
+            calendar.set(Calendar.DAY_OF_MONTH, target.get(Calendar.DAY_OF_MONTH));
+            mCrime.setDate(calendar.getTime());
         }
-        Date date = DatePickerFragment.getDate(data);
-        mCrime.setDate(date);
+        if (requestCode == REQUEST_TIME) {
+            Date date = TimePickerFragment.getDate(data);
+            Calendar target = Calendar.getInstance();
+            target.setTime(Objects.requireNonNull(date));
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(mCrime.getDate());
+            calendar.set(Calendar.HOUR, target.get(Calendar.HOUR));
+            calendar.set(Calendar.MINUTE, target.get(Calendar.MINUTE));
+            mCrime.setDate(calendar.getTime());
+        }
         updateDate();
     }
 
@@ -134,7 +158,7 @@ public class CrimeFragment extends Fragment {
         mDateButton = v.findViewById(R.id.crime_date);
         //是否解决
         mSolvedCheckBox = v.findViewById(R.id.crime_solved);
-        mTimeButton = v.findViewById(R.id.dialog_time_picker);
+        mTimeButton = v.findViewById(R.id.crime_time);
     }
 
     private void setTitleField() {
@@ -173,6 +197,18 @@ public class CrimeFragment extends Fragment {
         });
     }
 
+    private void setTimeButton() {
+        updateDate();
+        mTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment dialog = TimePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, CrimeFragment.REQUEST_TIME);
+                dialog.show(Objects.requireNonNull(getFragmentManager()), DIALOG_TIME);
+            }
+        });
+    }
+
     private void setSolvedCheckBox() {
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -185,6 +221,7 @@ public class CrimeFragment extends Fragment {
 
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
+        mTimeButton.setText(mCrime.getDate().toString());
     }
 
 }
