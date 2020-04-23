@@ -3,6 +3,8 @@ package com.zdran.criminalintent.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +32,9 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private List<Crime> mCrimeList;
+    private Button mJumpToFirstButton;
+    private Button mJumpToLastButton;
+
 
     public static Intent newIntent(Context context, UUID crimeId) {
         Intent intent = new Intent(context, CrimePagerActivity.class);
@@ -41,15 +46,36 @@ public class CrimePagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crime_pager);
-        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CIRME_ID);
 
-        mViewPager = findViewById(R.id.activity_crime_page_view_page);
+        this.init();
+        this.setViewPageAdapter();
+        this.setJumpToFirstButton();
+        this.setJumpToLastButton();
+
+        //跳转到指定位置
+        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CIRME_ID);
+        Crime crime = CrimeLab.getCrimeLab(this).getCrime(crimeId);
+        mViewPager.setCurrentItem(crime.getSorted());
+    }
+
+    /**
+     * 统一执行 findViewById 动作，以及部分变量的初始化动作
+     */
+    private void init() {
         mCrimeList = CrimeLab.getCrimeLab(this).getCrimeList();
+        mViewPager = findViewById(R.id.activity_crime_page_view_page);
+        mJumpToFirstButton = findViewById(R.id.jump_to_first_button);
+        mJumpToLastButton = findViewById(R.id.jump_to_last_button);
+    }
+
+    /**
+     * 设置 VIewPage 的 Adapter
+     */
+    private void setViewPageAdapter() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         //由于 API 的变动，这里 FragmentStatePagerAdapter 需要两个参数
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager,
                 FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-
             @NonNull
             @Override
             public Fragment getItem(int position) {
@@ -62,8 +88,23 @@ public class CrimePagerActivity extends AppCompatActivity {
                 return mCrimeList.size();
             }
         });
-        Crime crime = CrimeLab.getCrimeLab(this).getCrime(crimeId);
-        mViewPager.setCurrentItem(crime.getSorted());
+    }
 
+    private void setJumpToFirstButton() {
+        mJumpToFirstButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(0, true);
+            }
+        });
+    }
+
+    private void setJumpToLastButton() {
+        mJumpToLastButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(mCrimeList.size() - 1, true);
+            }
+        });
     }
 }
