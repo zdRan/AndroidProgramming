@@ -1,5 +1,7 @@
 package com.zdran.criminalintent.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,6 +22,7 @@ import com.zdran.criminalintent.R;
 import com.zdran.criminalintent.model.Crime;
 import com.zdran.criminalintent.model.CrimeLab;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -33,11 +36,15 @@ import static android.widget.CompoundButton.OnCheckedChangeListener;
 public class CrimeFragment extends Fragment {
     private static final String TAG = "CrimeFragment";
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String DIALOG_DATE = "DialogDate";
+    private static final int REQUEST_DATE = 1;
+
 
     private Crime mCrime;
 
     private EditText mTitleField;
     private Button mDateButton;
+    private Button mTimeButton;
 
     private CheckBox mSolvedCheckBox;
 
@@ -98,7 +105,39 @@ public class CrimeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
+        this.initView(v);
+
+        this.setTitleField();
+        this.setDateButton();
+        this.setSolvedCheckBox();
+
+        return v;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode != REQUEST_DATE) {
+            return;
+        }
+        Date date = DatePickerFragment.getDate(data);
+        mCrime.setDate(date);
+        updateDate();
+    }
+
+
+    private void initView(View v) {
         mTitleField = v.findViewById(R.id.crime_title);
+        //日期
+        mDateButton = v.findViewById(R.id.crime_date);
+        //是否解决
+        mSolvedCheckBox = v.findViewById(R.id.crime_solved);
+        mTimeButton = v.findViewById(R.id.dialog_time_picker);
+    }
+
+    private void setTitleField() {
         mTitleField.setText(mCrime.getTitle());
         //标题
         mTitleField.addTextChangedListener(new TextWatcher() {
@@ -117,12 +156,24 @@ public class CrimeFragment extends Fragment {
 
             }
         });
-        //日期
-        mDateButton = v.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getDate().toString());
-        mDateButton.setEnabled(false);
-        //是否解决
-        mSolvedCheckBox = v.findViewById(R.id.crime_solved);
+    }
+
+    private void setDateButton() {
+        updateDate();
+        //书中的代码有问题，应该启用按钮
+        //mDateButton.setEnabled(false);
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+                //类似于 startActivityForResult
+                dialog.setTargetFragment(CrimeFragment.this, CrimeFragment.REQUEST_DATE);
+                dialog.show(Objects.requireNonNull(getFragmentManager()), DIALOG_DATE);
+            }
+        });
+    }
+
+    private void setSolvedCheckBox() {
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -130,7 +181,10 @@ public class CrimeFragment extends Fragment {
                 mCrime.setSolved(isChecked);
             }
         });
-        return v;
-
     }
+
+    private void updateDate() {
+        mDateButton.setText(mCrime.getDate().toString());
+    }
+
 }
