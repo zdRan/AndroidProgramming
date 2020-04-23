@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.zdran.criminalintent.R;
+import com.zdran.criminalintent.activity.DatePickerDialogActivity;
 import com.zdran.criminalintent.model.Crime;
 import com.zdran.criminalintent.model.CrimeLab;
 
@@ -121,12 +122,13 @@ public class CrimeFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
         if (requestCode == REQUEST_DATE) {
-
-            Date date = DatePickerFragment.getDate(data);
+            Log.d(TAG, "onActivityResult: 执行！！" + requestCode);
+            Date date = DatePickerDialogActivity.getDate(data);
             Calendar target = Calendar.getInstance();
             target.setTime(Objects.requireNonNull(date));
 
@@ -189,10 +191,11 @@ public class CrimeFragment extends Fragment {
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                //类似于 startActivityForResult
-                dialog.setTargetFragment(CrimeFragment.this, CrimeFragment.REQUEST_DATE);
-                dialog.show(Objects.requireNonNull(getFragmentManager()), DIALOG_DATE);
+//                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+//                //类似于 startActivityForResult
+//                dialog.setTargetFragment(CrimeFragment.this, CrimeFragment.REQUEST_DATE);
+//                dialog.show(Objects.requireNonNull(getFragmentManager()), DIALOG_DATE);
+                startActivityForResult(DatePickerDialogActivity.newIntent(getActivity(), mCrime.getDate()), REQUEST_DATE);
             }
         });
     }

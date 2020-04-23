@@ -12,6 +12,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activity.CrimePagerActivity" />
+        <activity android:name=".activity.DatePickerDialogActivity" />
         <activity android:name=".activity.CrimeListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
