@@ -1,5 +1,6 @@
 package com.zdran.criminalintent.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -56,6 +57,12 @@ public class CrimePagerActivity extends AppCompatActivity {
         UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CIRME_ID);
         Crime crime = CrimeLab.getCrimeLab(this).getCrime(crimeId);
         mViewPager.setCurrentItem(crime.getSorted());
+    }
+
+    @Override
+    public void finish() {
+        setResult(Activity.RESULT_OK);
+        super.finish();
     }
 
     /**

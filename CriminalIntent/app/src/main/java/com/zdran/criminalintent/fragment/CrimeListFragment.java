@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -33,6 +36,12 @@ public class CrimeListFragment extends Fragment {
     private CrimeListAdapter mCrimeListAdapter;
     private int mPosition = -1;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,6 +51,29 @@ public class CrimeListFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         this.updateUI();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.updateUI();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime_list, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_crime:
+                this.newCrimeMenu();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private class CrimeListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -125,12 +157,6 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        this.updateUI();
-    }
-
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.getCrimeLab(getActivity());
         List<Crime> crimeList = crimeLab.getCrimeList();
@@ -140,7 +166,14 @@ public class CrimeListFragment extends Fragment {
         } else {
             mCrimeListAdapter.notifyItemChanged(mPosition);
         }
-
-
     }
+
+    private void newCrimeMenu() {
+        Crime crime = new Crime();
+        CrimeLab.getCrimeLab(getActivity()).addCrime(crime);
+        //打开详情页
+        Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+        startActivity(intent);
+    }
+
 }
