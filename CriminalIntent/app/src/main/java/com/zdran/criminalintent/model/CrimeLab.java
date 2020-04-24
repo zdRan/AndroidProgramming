@@ -2,13 +2,12 @@ package com.zdran.criminalintent.model;
 
 import android.content.Context;
 
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Create by Ranzd on 2020-04-19 10:14
@@ -18,18 +17,13 @@ import java.util.stream.Collectors;
 public class CrimeLab {
 
     private static CrimeLab sCrimeLab;
+    private List<Crime> mCrimeList;
     private Map<UUID, Crime> mUUIDCrimeMap;
 
     private CrimeLab(Context context) {
+        mCrimeList = new LinkedList<>();
         mUUIDCrimeMap = new HashMap<>();
-        for (int i = 0; i < 100; i++) {
-            Crime crime = new Crime();
-            crime.setSorted(i);
-            crime.setTitle("Crime #" + i);
-            crime.setSolved(i % 2 == 0);
-            crime.setRequiresPolice(i % 3 == 0);
-            mUUIDCrimeMap.put(crime.getId(), crime);
-        }
+
     }
 
     public static CrimeLab getCrimeLab(Context context) {
@@ -40,15 +34,15 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimeList() {
-        return mUUIDCrimeMap.values().stream().sorted(new Comparator<Crime>() {
-            @Override
-            public int compare(Crime o1, Crime o2) {
-                return o1.getSorted() - o2.getSorted();
-            }
-        }).collect(Collectors.<Crime>toList());
+        return mCrimeList;
     }
 
     public Crime getCrime(UUID uuid) {
         return mUUIDCrimeMap.get(uuid);
+    }
+
+    public void addCrime(Crime crime) {
+        mCrimeList.add(crime);
+        mUUIDCrimeMap.put(crime.getId(), crime);
     }
 }
