@@ -56,7 +56,14 @@ public class CrimePagerActivity extends AppCompatActivity {
         //跳转到指定位置
         UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CIRME_ID);
         Crime crime = CrimeLab.getCrimeLab(this).getCrime(crimeId);
-        mViewPager.setCurrentItem(crime.getSorted());
+        //使用菜单栏打开页面时，sorted 始终为 0
+//        mViewPager.setCurrentItem(crime.getSorted());
+        List<Crime> crimeList = CrimeLab.getCrimeLab(this).getCrimeList();
+        for (int i = 0; i < crimeList.size(); i++) {
+            if (crimeList.get(i).getId().equals(crimeId)) {
+                mViewPager.setCurrentItem(i);
+            }
+        }
     }
 
     @Override
