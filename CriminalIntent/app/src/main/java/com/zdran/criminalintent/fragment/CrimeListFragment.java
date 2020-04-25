@@ -51,7 +51,6 @@ public class CrimeListFragment extends Fragment {
         }
         //从缓存中加载子标题的状态
         mSubtitleVisible = Boolean.valueOf(LocalCache.getInstance(getActivity()).get(SUBTITLE_VISIBLE, "false"));
-
     }
 
     @Nullable
@@ -92,6 +91,8 @@ public class CrimeListFragment extends Fragment {
                 this.newCrimeMenu();
                 return true;
             case R.id.show_subtitle:
+                mSubtitleVisible = !mSubtitleVisible;
+                Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
                 this.updateSubtitle();
                 return true;
             default:
@@ -212,12 +213,10 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateSubtitle() {
-        mSubtitleVisible = !mSubtitleVisible;
-        Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
 
         CrimeLab crimeLab = CrimeLab.getCrimeLab(getActivity());
         int count = crimeLab.getCrimeList().size();
-        String subTitle = getString(R.string.subtitle_format, count);
+        String subTitle = getResources().getQuantityString(R.plurals.subtitle_plural, count, count);
         if (!mSubtitleVisible) {
             subTitle = null;
         }
