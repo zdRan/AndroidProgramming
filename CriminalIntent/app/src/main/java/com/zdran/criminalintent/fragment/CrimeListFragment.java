@@ -23,6 +23,7 @@ import com.zdran.criminalintent.R;
 import com.zdran.criminalintent.activity.CrimePagerActivity;
 import com.zdran.criminalintent.model.Crime;
 import com.zdran.criminalintent.model.CrimeLab;
+import com.zdran.criminalintent.model.LocalCache;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +47,9 @@ public class CrimeListFragment extends Fragment {
         if (savedInstanceState != null) {
             mSubtitleVisible = savedInstanceState.getBoolean(SUBTITLE_VISIBLE, false);
         }
+        //从缓存中加载子标题的状态
+        mSubtitleVisible = Boolean.valueOf(LocalCache.getInstance(getActivity()).get(SUBTITLE_VISIBLE, "false"));
+
     }
 
     @Nullable
@@ -85,8 +89,7 @@ public class CrimeListFragment extends Fragment {
                 this.newCrimeMenu();
                 return true;
             case R.id.show_subtitle:
-                mSubtitleVisible = !mSubtitleVisible;
-                Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
+
                 this.updateSubtitle();
                 return true;
             default:
@@ -155,9 +158,6 @@ public class CrimeListFragment extends Fragment {
                 case 0:
                     itemView = layoutInflater.inflate(R.layout.list_item_crime_requires_police, parent, false);
                     break;
-                case 1:
-                    itemView = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
-                    break;
                 default:
                     itemView = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
             }
@@ -204,10 +204,15 @@ public class CrimeListFragment extends Fragment {
         CrimeLab.getCrimeLab(getActivity()).addCrime(crime);
         //打开详情页
         Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+        //通过菜单打开页面时缓存子标题的状态，用于解决菜单栏里的向上按钮导致的子标题无法显示的问题
+        LocalCache.getInstance(getActivity()).put(SUBTITLE_VISIBLE, Boolean.toString(mSubtitleVisible));
         startActivity(intent);
     }
 
     private void updateSubtitle() {
+        mSubtitleVisible = !mSubtitleVisible;
+        Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
+
         CrimeLab crimeLab = CrimeLab.getCrimeLab(getActivity());
         int count = crimeLab.getCrimeList().size();
         String subTitle = getString(R.string.subtitle_format, count);
