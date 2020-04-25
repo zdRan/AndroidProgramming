@@ -43,10 +43,9 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 1;
-
     private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_TIME = 2;
-
+    private static final String EXTRA_DELETE = "com.zdran.criminalintent.delete";
 
     private Crime mCrime;
 
@@ -62,6 +61,13 @@ public class CrimeFragment extends Fragment {
         CrimeFragment crimeFragment = new CrimeFragment();
         crimeFragment.setArguments(bundle);
         return crimeFragment;
+    }
+
+    public static boolean isDelete(Intent intent) {
+        if (intent == null) {
+            return false;
+        }
+        return intent.getBooleanExtra(EXTRA_DELETE, false);
     }
 
     @Override
@@ -251,7 +257,9 @@ public class CrimeFragment extends Fragment {
 
     private void deleteItem() {
         CrimeLab.getCrimeLab(getActivity()).deleteCrime(mCrime.getId());
-
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_DELETE, true);
+        getActivity().setResult(Activity.RESULT_OK, intent);
     }
 
 }

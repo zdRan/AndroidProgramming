@@ -1,6 +1,5 @@
 package com.zdran.criminalintent.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -66,11 +65,6 @@ public class CrimePagerActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void finish() {
-        setResult(Activity.RESULT_OK);
-        super.finish();
-    }
 
     /**
      * 统一执行 findViewById 动作，以及部分变量的初始化动作

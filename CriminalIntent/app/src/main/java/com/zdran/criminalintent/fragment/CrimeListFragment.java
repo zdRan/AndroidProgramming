@@ -1,5 +1,6 @@
 package com.zdran.criminalintent.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -37,6 +38,7 @@ import java.util.Objects;
 public class CrimeListFragment extends Fragment {
     private static final String TAG = "CrimeListFragment";
     private static final String SUBTITLE_VISIBLE = "subtitleVisible";
+    private static final int REQUEST_DETAIL = 1;
     private RecyclerView mRecyclerView;
     private CrimeListAdapter mCrimeListAdapter;
     private int mPosition = 0;
@@ -67,7 +69,6 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mCrimeListAdapter.notifyDataSetChanged();
         this.updateUI();
     }
 
@@ -106,6 +107,20 @@ public class CrimeListFragment extends Fragment {
         outState.putBoolean(SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_DETAIL) {
+            if (CrimeFragment.isDelete(data)) {
+                mCrimeListAdapter.notifyDataSetChanged();
+            }
+        }
+
+    }
+
     private class CrimeListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mTitleTextView;
         private TextView mDateTextView;
@@ -140,7 +155,7 @@ public class CrimeListFragment extends Fragment {
             Log.d(TAG, "onClick: " + mPosition);
             //打开详情页
             Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_DETAIL);
         }
     }
 
