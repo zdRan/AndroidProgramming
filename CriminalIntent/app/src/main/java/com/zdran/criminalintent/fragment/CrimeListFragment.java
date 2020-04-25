@@ -3,6 +3,7 @@ package com.zdran.criminalintent.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,10 +35,11 @@ import java.util.Objects;
  * @author cm.zdran@foxmail.com
  */
 public class CrimeListFragment extends Fragment {
+    private static final String TAG = "CrimeListFragment";
     private static final String SUBTITLE_VISIBLE = "subtitleVisible";
     private RecyclerView mRecyclerView;
     private CrimeListAdapter mCrimeListAdapter;
-    private int mPosition = -1;
+    private int mPosition = 0;
     private boolean mSubtitleVisible;
 
     @Override
@@ -66,6 +68,7 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        mCrimeListAdapter.notifyDataSetChanged();
         this.updateUI();
     }
 
@@ -89,7 +92,6 @@ public class CrimeListFragment extends Fragment {
                 this.newCrimeMenu();
                 return true;
             case R.id.show_subtitle:
-
                 this.updateSubtitle();
                 return true;
             default:
@@ -134,7 +136,7 @@ public class CrimeListFragment extends Fragment {
         public void onClick(View v) {
             //记录当前位置
             mPosition = super.getBindingAdapterPosition();
-
+            Log.d(TAG, "onClick: " + mPosition);
             //打开详情页
             Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);

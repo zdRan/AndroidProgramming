@@ -45,4 +45,9 @@ public class CrimeLab {
         mCrimeList.add(crime);
         mUUIDCrimeMap.put(crime.getId(), crime);
     }
+
+    public void deleteCrime(UUID uuid) {
+        Crime crime = mUUIDCrimeMap.remove(uuid);
+        mCrimeList.remove(crime);
+    }
 }

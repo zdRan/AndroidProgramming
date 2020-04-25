@@ -7,6 +7,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -64,6 +67,7 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         UUID uuid = (UUID) Objects.requireNonNull(getArguments()).getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.getCrimeLab(getActivity()).getCrime(uuid);
         Log.d(TAG, "创建 CrimeFragment: " + mCrime.toString());
@@ -118,6 +122,24 @@ public class CrimeFragment extends Fragment {
         this.setSolvedCheckBox();
 
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete_crime:
+                this.deleteItem();
+                getActivity().finish();
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -225,6 +247,11 @@ public class CrimeFragment extends Fragment {
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
         mTimeButton.setText(mCrime.getDate().toString());
+    }
+
+    private void deleteItem() {
+        CrimeLab.getCrimeLab(getActivity()).deleteCrime(mCrime.getId());
+
     }
 
 }
