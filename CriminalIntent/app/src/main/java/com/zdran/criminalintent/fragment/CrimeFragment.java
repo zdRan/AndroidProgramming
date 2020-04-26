@@ -95,6 +95,8 @@ public class CrimeFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause: 执行 " + mCrime.getTitle());
+        CrimeLab.getCrimeLab(getActivity()).updateCrime(mCrime);
+
     }
 
     @Override

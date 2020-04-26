@@ -1,11 +1,13 @@
 package com.zdran.criminalintent.model;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import com.zdran.criminalintent.database.CrimeBaseHelper;
+import com.zdran.criminalintent.database.CrimeDbSchema.CrimeTable;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,12 +19,14 @@ import java.util.UUID;
 public class CrimeLab {
 
     private static CrimeLab sCrimeLab;
-    private List<Crime> mCrimeList;
-    private Map<UUID, Crime> mUUIDCrimeMap;
+
+    private Context mContext;
+    private SQLiteDatabase mSQLiteDatabase;
 
     private CrimeLab(Context context) {
-        mCrimeList = new LinkedList<>();
-        mUUIDCrimeMap = new HashMap<>();
+
+        mContext = context.getApplicationContext();
+        mSQLiteDatabase = new CrimeBaseHelper(mContext).getWritableDatabase();
 
     }
 
@@ -34,20 +38,36 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimeList() {
-        return mCrimeList;
+        return null;
     }
 
     public Crime getCrime(UUID uuid) {
-        return mUUIDCrimeMap.get(uuid);
+        return null;
     }
 
     public void addCrime(Crime crime) {
-        mCrimeList.add(crime);
-        mUUIDCrimeMap.put(crime.getId(), crime);
+        ContentValues contentValues = getContentValeus(crime);
+        mSQLiteDatabase.insert(CrimeTable.NAME, null, contentValues);
+    }
+
+    public void updateCrime(Crime crime) {
+        String uuid = crime.getId().toString();
+        ContentValues value = getContentValeus(crime);
+        mSQLiteDatabase.update(CrimeTable.NAME, value,
+                CrimeTable.Cols.UUID + " = ?", new String[]{uuid});
     }
 
     public void deleteCrime(UUID uuid) {
-        Crime crime = mUUIDCrimeMap.remove(uuid);
-        mCrimeList.remove(crime);
+        mSQLiteDatabase.delete(CrimeTable.NAME,
+                CrimeTable.Cols.UUID + " = ?", new String[]{uuid.toString()});
+    }
+
+    private static ContentValues getContentValeus(Crime crime) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CrimeTable.Cols.UUID, crime.getId().toString());
+        contentValues.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        contentValues.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
+        contentValues.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
+        return contentValues;
     }
 }
