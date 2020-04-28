@@ -65,7 +65,7 @@ public class CrimeLab {
     }
 
     public void addCrime(Crime crime) {
-        ContentValues contentValues = getContentValeus(crime);
+        ContentValues contentValues = getContentValues(crime);
         mSQLiteDatabase.insert(CrimeTable.NAME, null, contentValues);
     }
 
@@ -78,7 +78,7 @@ public class CrimeLab {
 
     public void updateCrime(Crime crime) {
         String uuid = crime.getId().toString();
-        ContentValues value = getContentValeus(crime);
+        ContentValues value = getContentValues(crime);
         mSQLiteDatabase.update(CrimeTable.NAME, value,
                 CrimeTable.Cols.UUID + " = ?", new String[]{uuid});
     }
@@ -88,7 +88,7 @@ public class CrimeLab {
                 CrimeTable.Cols.UUID + " = ?", new String[]{uuid.toString()});
     }
 
-    private static ContentValues getContentValeus(Crime crime) {
+    private static ContentValues getContentValues(Crime crime) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(CrimeTable.Cols.UUID, crime.getId().toString());
         contentValues.put(CrimeTable.Cols.TITLE, crime.getTitle());
