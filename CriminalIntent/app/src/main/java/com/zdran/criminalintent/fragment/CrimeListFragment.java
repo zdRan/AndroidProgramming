@@ -199,6 +199,10 @@ public class CrimeListFragment extends Fragment {
         public int getItemViewType(int position) {
             return mCrimeList.get(position).isRequiresPolice() ? 0 : 1;
         }
+
+        public void setCrimeList(List<Crime> crimeList) {
+            mCrimeList = crimeList;
+        }
     }
 
     /**
@@ -215,6 +219,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeListAdapter = new CrimeListAdapter(crimeList);
             mRecyclerView.setAdapter(mCrimeListAdapter);
         } else {
+            mCrimeListAdapter.setCrimeList(crimeList);
             mCrimeListAdapter.notifyItemChanged(mPosition);
         }
         this.updateSubtitle();

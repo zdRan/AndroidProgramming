@@ -2,11 +2,14 @@ package com.zdran.criminalintent.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.zdran.criminalintent.database.CrimeBaseHelper;
+import com.zdran.criminalintent.database.CrimeCursorWrapper;
 import com.zdran.criminalintent.database.CrimeDbSchema.CrimeTable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,16 +41,39 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimeList() {
-        return null;
+        List<Crime> crimeList = new ArrayList<>();
+        CrimeCursorWrapper crimeCursorWrapper = this.queryCrime(null, null);
+
+        crimeCursorWrapper.moveToFirst();
+        while (!crimeCursorWrapper.isAfterLast()) {
+            crimeList.add(crimeCursorWrapper.getCrime());
+            crimeCursorWrapper.moveToNext();
+        }
+
+        crimeCursorWrapper.close();
+        return crimeList;
     }
 
     public Crime getCrime(UUID uuid) {
-        return null;
+        CrimeCursorWrapper crimeCursorWrapper = this.queryCrime(CrimeTable.Cols.UUID + " = ?",
+                new String[]{uuid.toString()});
+        if (crimeCursorWrapper.getCount() == 0) {
+            return null;
+        }
+        crimeCursorWrapper.moveToFirst();
+        return crimeCursorWrapper.getCrime();
     }
 
     public void addCrime(Crime crime) {
         ContentValues contentValues = getContentValeus(crime);
         mSQLiteDatabase.insert(CrimeTable.NAME, null, contentValues);
+    }
+
+    public CrimeCursorWrapper queryCrime(String whereClause, String[] whereArgs) {
+        Cursor cursor = mSQLiteDatabase.query(CrimeTable.NAME,
+                null, whereClause, whereArgs,
+                null, null, null);
+        return new CrimeCursorWrapper(cursor);
     }
 
     public void updateCrime(Crime crime) {
