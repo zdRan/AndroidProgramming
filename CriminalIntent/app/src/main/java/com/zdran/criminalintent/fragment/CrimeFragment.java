@@ -2,6 +2,7 @@ package com.zdran.criminalintent.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -53,6 +54,7 @@ public class CrimeFragment extends Fragment {
     private static final String EXTRA_DELETE = "com.zdran.criminalintent.delete";
 
     private Crime mCrime;
+    private final Intent pickIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 
 
     private EditText mTitleField;
@@ -138,7 +140,9 @@ public class CrimeFragment extends Fragment {
         this.setSolvedCheckBox();
         this.setReportButton();
         this.setSuspectButton();
-
+        //验证禁用是否生效
+        //pickIntent.addCategory(Intent.CATEGORY_APP_BROWSER);
+        this.checkActivity();
         return v;
     }
 
@@ -300,7 +304,6 @@ public class CrimeFragment extends Fragment {
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                 startActivityForResult(pickIntent, REQUEST_CONTACT);
             }
         });
@@ -334,4 +337,14 @@ public class CrimeFragment extends Fragment {
         return getString(R.string.crime_report, mCrime.getTitle(), dateString, solved, suspect);
     }
 
+    /**
+     * 检查是否有联系人、发送信息等相关应用
+     */
+    private void checkActivity() {
+        PackageManager pm = Objects.requireNonNull(getActivity()).getPackageManager();
+        //如果没有联系人相关应用，则禁用
+        if (pm.resolveActivity(pickIntent, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mSuspectButton.setEnabled(false);
+        }
+    }
 }
