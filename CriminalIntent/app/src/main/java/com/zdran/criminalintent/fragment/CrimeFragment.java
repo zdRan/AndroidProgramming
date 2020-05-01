@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,6 +53,8 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private Button mDateButton;
     private Button mTimeButton;
+    private Button mReportButton;
+    private Button mSuspectButton;
 
     private CheckBox mSolvedCheckBox;
 
@@ -128,6 +131,7 @@ public class CrimeFragment extends Fragment {
         this.setDateButton();
         this.setTimeButton();
         this.setSolvedCheckBox();
+        this.setReportButton();
 
         return v;
     }
@@ -191,6 +195,8 @@ public class CrimeFragment extends Fragment {
         //是否解决
         mSolvedCheckBox = v.findViewById(R.id.crime_solved);
         mTimeButton = v.findViewById(R.id.crime_time);
+        mReportButton = v.findViewById(R.id.crime_report);
+        mSuspectButton = v.findViewById(R.id.crime_suspect);
     }
 
     private void setTitleField() {
@@ -252,6 +258,19 @@ public class CrimeFragment extends Fragment {
         });
     }
 
+    private void setReportButton() {
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+                startActivity(intent);
+            }
+        });
+    }
+
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
         mTimeButton.setText(mCrime.getDate().toString());
@@ -261,7 +280,23 @@ public class CrimeFragment extends Fragment {
         CrimeLab.getCrimeLab(getActivity()).deleteCrime(mCrime.getId());
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DELETE, true);
-        getActivity().setResult(Activity.RESULT_OK, intent);
+        Objects.requireNonNull(getActivity()).setResult(Activity.RESULT_OK, intent);
+    }
+
+    private String getCrimeReport() {
+
+        String solved = mCrime.isSolved() ?
+                getString(R.string.crime_report_solved) :
+                getString(R.string.crime_report_unsolved);
+        String dateString = DateFormat.format("yyyy-MM-dd E hh:mm:ss", mCrime.getDate()).toString();
+        String suspect = mCrime.getSuspect();
+        if (suspect == null) {
+            suspect = getString(R.string.crime_report_no_suspect);
+        } else {
+            suspect = getString(R.string.crime_report_suspect, suspect);
+        }
+
+        return getString(R.string.crime_report, mCrime.getTitle(), dateString, solved, suspect);
     }
 
 }
