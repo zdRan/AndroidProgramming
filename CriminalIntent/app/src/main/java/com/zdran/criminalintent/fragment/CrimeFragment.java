@@ -2,7 +2,10 @@ package com.zdran.criminalintent.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -46,9 +49,11 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_DATE = 1;
     private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_TIME = 2;
+    private static final int REQUEST_CONTACT = 3;
     private static final String EXTRA_DELETE = "com.zdran.criminalintent.delete";
 
     private Crime mCrime;
+
 
     private EditText mTitleField;
     private Button mDateButton;
@@ -132,6 +137,7 @@ public class CrimeFragment extends Fragment {
         this.setTimeButton();
         this.setSolvedCheckBox();
         this.setReportButton();
+        this.setSuspectButton();
 
         return v;
     }
@@ -172,6 +178,7 @@ public class CrimeFragment extends Fragment {
             calendar.set(Calendar.MONTH, target.get(Calendar.MONTH));
             calendar.set(Calendar.DAY_OF_MONTH, target.get(Calendar.DAY_OF_MONTH));
             mCrime.setDate(calendar.getTime());
+            return;
         }
         if (requestCode == REQUEST_TIME) {
             Date date = TimePickerFragment.getDate(data);
@@ -183,6 +190,23 @@ public class CrimeFragment extends Fragment {
             calendar.set(Calendar.HOUR, target.get(Calendar.HOUR));
             calendar.set(Calendar.MINUTE, target.get(Calendar.MINUTE));
             mCrime.setDate(calendar.getTime());
+            return;
+        }
+        if (requestCode == REQUEST_CONTACT && data != null) {
+            Uri uri = data.getData();
+            String[] queryFields = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+            Cursor cursor = Objects.requireNonNull(getActivity()).getContentResolver()
+                    .query(Objects.requireNonNull(uri), queryFields, null, null, null);
+
+            if (Objects.requireNonNull(cursor).getCount() == 0) {
+                Objects.requireNonNull(cursor).close();
+                return;
+            }
+            cursor.moveToFirst();
+            String name = cursor.getString(0);
+            mCrime.setSuspect(name);
+            mSuspectButton.setText(name);
+
         }
         updateDate();
     }
@@ -268,6 +292,16 @@ public class CrimeFragment extends Fragment {
                 intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
                 intent = Intent.createChooser(intent, getString(R.string.send_report));
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void setSuspectButton() {
+        mSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(pickIntent, REQUEST_CONTACT);
             }
         });
     }
