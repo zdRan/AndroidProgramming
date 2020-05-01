@@ -19,6 +19,10 @@ public class Crime {
      */
     private String mTitle;
     /**
+     * 嫌疑人姓名
+     */
+    private String mSuspect;
+    /**
      * 日期
      */
     private Date mDate;
@@ -61,6 +65,14 @@ public class Crime {
         mTitle = title;
     }
 
+    public String getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(String suspect) {
+        mSuspect = suspect;
+    }
+
     public Date getDate() {
         return mDate;
     }
@@ -100,6 +112,8 @@ public class Crime {
                 .append(mId);
         sb.append(",\"mTitle\":\"")
                 .append(mTitle).append('\"');
+        sb.append(",\"mSuspect\":\"")
+                .append(mSuspect).append('\"');
         sb.append(",\"mDate\":\"")
                 .append(mDate).append('\"');
         sb.append(",\"mSolved\":")

@@ -92,6 +92,7 @@ public class CrimeLab {
         ContentValues contentValues = new ContentValues();
         contentValues.put(CrimeTable.Cols.UUID, crime.getId().toString());
         contentValues.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        contentValues.put(CrimeTable.Cols.SUSPECT, crime.getSuspect());
         contentValues.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
         contentValues.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
         return contentValues;
