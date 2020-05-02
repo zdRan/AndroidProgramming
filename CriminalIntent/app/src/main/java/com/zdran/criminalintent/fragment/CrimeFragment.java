@@ -24,6 +24,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 
 import com.zdran.criminalintent.R;
@@ -290,11 +291,18 @@ public class CrimeFragment extends Fragment {
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
-                intent = Intent.createChooser(intent, getString(R.string.send_report));
+//                Intent intent = new Intent(Intent.ACTION_SEND);
+//                intent.setType("text/plain");
+//                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+//                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+//                intent = Intent.createChooser(intent, getString(R.string.send_report));
+//                startActivity(intent);
+
+                Intent intent = ShareCompat.IntentBuilder.from(Objects.requireNonNull(getActivity()))
+                        .setText(getCrimeReport())
+                        .setSubject(getString(R.string.crime_report_subject))
+                        .setChooserTitle(getString(R.string.send_report))
+                        .createChooserIntent();
                 startActivity(intent);
             }
         });
